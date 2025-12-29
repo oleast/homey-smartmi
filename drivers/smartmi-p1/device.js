@@ -10,6 +10,9 @@ class SmartmiP1Device extends Homey.Device {
   async onInit() {
     this.log('SmartmiP1Device has been initialized');
 
+    // Track connection state
+    this.connected = false;
+
     // Get device settings
     const settings = this.getSettings();
     this.log('Device settings:', settings);
@@ -50,12 +53,14 @@ class SmartmiP1Device extends Homey.Device {
       // Handle device connection
       this.device.on('connected', () => {
         this.log('Connected to device');
+        this.connected = true;
         this.setAvailable().catch(this.error);
       });
 
       // Handle device disconnection
       this.device.on('disconnected', () => {
         this.log('Disconnected from device');
+        this.connected = false;
         this.setUnavailable('Device disconnected').catch(this.error);
       });
 
@@ -93,6 +98,7 @@ class SmartmiP1Device extends Homey.Device {
       }
 
       // DPS 2: Mode (auto, sleep, favorite, manual)
+      // Note: Tuya uses UK spelling 'favourite', but Homey capability uses US spelling 'favorite'
       if (dps['2'] !== undefined) {
         const modeMap = {
           'auto': 'auto',
@@ -153,9 +159,9 @@ class SmartmiP1Device extends Homey.Device {
     // Poll every 30 seconds
     this.pollingInterval = setInterval(async () => {
       try {
-        if (this.device && this.device.isConnected()) {
+        if (this.device && this.connected) {
           await this.device.get({ schema: true });
-        } else {
+        } else if (this.device && !this.connected) {
           // Try to reconnect
           await this.initializeTuyaDevice();
         }
@@ -211,6 +217,7 @@ class SmartmiP1Device extends Homey.Device {
   async onCapabilityMode(value) {
     this.log('Setting mode:', value);
     try {
+      // Convert Homey capability value (US spelling) to Tuya DPS value (UK spelling)
       const modeMap = {
         'auto': 'auto',
         'sleep': 'sleep',

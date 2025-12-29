@@ -1,0 +1,18 @@
+{
+  "pair": {
+    "title": "Add Smartmi Air Purifier P1",
+    "intro": "Make sure your Smartmi Air Purifier P1 is connected to your network and you have obtained the Device ID and Local Key.",
+    "missing_credentials": "Please enter IP Address, Device ID, and Local Key"
+  },
+  "settings": {
+    "title": "Device Settings",
+    "ipAddress": "IP Address",
+    "ipAddress_hint": "The IP address of your Smartmi Air Purifier P1",
+    "localKey": "Local Key",
+    "localKey_hint": "The local key for your device (obtained from Tuya/Smartmi app)",
+    "deviceId": "Device ID",
+    "deviceId_hint": "The device ID (obtained from Tuya/Smartmi app)",
+    "protocol": "Protocol Version",
+    "saved": "Settings saved successfully"
+  }
+}

@@ -8,22 +8,39 @@ The following data points are used to communicate with the device:
 
 | DPS | Description | Type | Values | Read/Write |
 |-----|-------------|------|--------|------------|
-| 1 | Power | Boolean | true/false | R/W |
-| 2 | Mode | String | auto, sleep, favourite, manual | R/W |
-| 3 | Fan Speed | Integer | 0-100 or 1-3 | R/W |
-| 4 | Fan Speed Level | Integer | 1-3 (alternative to DPS 3) | R/W |
-| 5 | Child Lock | Boolean | true/false | R/W |
-| 11 | PM2.5 | Integer | Air quality in µg/m³ | R |
-| 12 | Filter Life | Integer | 0-100 (percentage remaining) | R |
-| 13 | Temperature | Integer | Temperature in °C | R |
-| 14 | Humidity | Integer | Humidity percentage | R |
+| 109 | Fan Speed | Integer | 1-100 (0 = off) | R/W |
+| 3 | Mode | String | auto, sleep, strong, manual | R/W |
+| 7 | Child Lock | Boolean | true/false | R/W |
+| 2 | PM2.5 | Integer | Air quality in µg/m³ | R |
+| 104 | Filter Life | Integer | 0-100 (percentage remaining) | R |
 
-## Notes
+## Additional Available DPS (Not Currently Implemented)
 
-- The actual DPS values may vary between different firmware versions
-- Some devices may use different DPS numbers for the same functionality
-- If the device doesn't respond to certain commands, you may need to adjust the DPS mappings in `device.js`
-- You can monitor the device communication in the Homey app logs to see actual DPS values
+| DPS | Description | Type | Values | Notes |
+|-----|-------------|------|--------|-------|
+| 101 | Sound | Boolean | true/false | Sound on/off |
+| 110 | Screen Brightness | String | BRIGHTNESS_AUTO, BRIGHTNESS_OFF, BRIGHTNESS_LOW, BRIGHTNESS_HIGH | Display brightness |
+| 103 | Timer | String | 0_hour, 1_hour, 2_hour, 4_hour, 8_hour | Auto-off timer |
+| 19 | Timer Remaining | Integer | Minutes remaining | Duration sensor |
+| 102 | PM10 Density | Integer | µg/m³ | Larger particulate matter |
+| 105 | Filter Usage | Integer | Hours used | Duration sensor |
+| 22 | Fault Alarm | Integer | 0 = no fault | Diagnostic sensor |
+
+## Power Control
+
+Note: There is no dedicated power DPS. The device is controlled through the fan speed (DPS 109):
+- Fan speed = 0: Device is off
+- Fan speed > 0: Device is on (minimum value is 1)
+
+When the user toggles power on, the device is set to minimum fan speed (1).
+
+## Mode Values
+
+The mode DPS (3) accepts the following string values:
+- `auto`: Automatic mode based on air quality
+- `sleep`: Low-noise operation for nighttime
+- `strong`: Maximum purification
+- `manual`: Manual fan speed control
 
 ## Protocol
 

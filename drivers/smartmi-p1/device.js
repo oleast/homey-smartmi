@@ -89,63 +89,41 @@ class SmartmiP1Device extends Homey.Device {
       const dps = data.dps || data;
 
       // Map Tuya DPS (Data Point System) to Homey capabilities
-      // These mappings are specific to Smartmi Air Purifier P1
-      // DPS mappings may vary, these are common for Tuya air purifiers
+      // DPS mappings for Smartmi Air Purifier P1
+      // Based on actual device specification
       
-      // DPS 1: Power on/off
-      if (dps['1'] !== undefined) {
-        this.setCapabilityValue('onoff', dps['1']).catch(this.error);
+      // Note: No explicit power DPS - power is controlled through fan speed
+      // When fan speed > 0, device is on; when fan speed = 0, device is off
+      
+      // DPS 109: Fan speed (1-100)
+      if (dps['109'] !== undefined) {
+        const fanSpeed = parseInt(dps['109'], 10);
+        // Update power state based on fan speed
+        const isOn = fanSpeed > 0;
+        this.setCapabilityValue('onoff', isOn).catch(this.error);
+        // Convert 1-100 to 0-1 for Homey dim capability
+        this.setCapabilityValue('dim', fanSpeed / 100).catch(this.error);
       }
 
-      // DPS 2: Mode (auto, sleep, favorite, manual)
-      // Note: Tuya uses UK spelling 'favourite', but Homey capability uses US spelling 'favorite'
-      if (dps['2'] !== undefined) {
-        const modeMap = {
-          'auto': 'auto',
-          'sleep': 'sleep',
-          'favourite': 'favorite',
-          'manual': 'manual',
-        };
-        const mode = modeMap[dps['2']] || 'auto';
+      // DPS 3: Mode (auto, sleep, strong, manual)
+      if (dps['3'] !== undefined) {
+        const mode = dps['3'];
         this.setCapabilityValue('air_purifier_mode', mode).catch(this.error);
       }
 
-      // DPS 3: Fan speed (0-100 or 1-3)
-      if (dps['3'] !== undefined) {
-        const fanSpeed = typeof dps['3'] === 'number' ? dps['3'] / 100 : 0.5;
-        this.setCapabilityValue('dim', fanSpeed).catch(this.error);
+      // DPS 7: Child lock
+      if (dps['7'] !== undefined) {
+        this.setCapabilityValue('child_lock', dps['7']).catch(this.error);
       }
 
-      // DPS 4: Fan speed level (alternative)
-      if (dps['4'] !== undefined && dps['3'] === undefined) {
-        const level = parseInt(dps['4'], 10);
-        const fanSpeed = level / 3; // Assuming 3 levels
-        this.setCapabilityValue('dim', fanSpeed).catch(this.error);
+      // DPS 2: PM2.5 value
+      if (dps['2'] !== undefined) {
+        this.setCapabilityValue('measure_pm25', parseInt(dps['2'], 10)).catch(this.error);
       }
 
-      // DPS 5: Child lock
-      if (dps['5'] !== undefined) {
-        this.setCapabilityValue('child_lock', dps['5']).catch(this.error);
-      }
-
-      // DPS 11: PM2.5 value
-      if (dps['11'] !== undefined) {
-        this.setCapabilityValue('measure_pm25', parseInt(dps['11'], 10)).catch(this.error);
-      }
-
-      // DPS 12: Filter life remaining (percentage)
-      if (dps['12'] !== undefined) {
-        this.setCapabilityValue('filter_life', parseInt(dps['12'], 10)).catch(this.error);
-      }
-
-      // DPS 13: Temperature
-      if (dps['13'] !== undefined) {
-        this.setCapabilityValue('measure_temperature', parseInt(dps['13'], 10)).catch(this.error);
-      }
-
-      // DPS 14: Humidity
-      if (dps['14'] !== undefined) {
-        this.setCapabilityValue('measure_humidity', parseInt(dps['14'], 10)).catch(this.error);
+      // DPS 104: Filter life remaining (percentage)
+      if (dps['104'] !== undefined) {
+        this.setCapabilityValue('filter_life', parseInt(dps['104'], 10)).catch(this.error);
       }
     } catch (error) {
       this.error('Error handling device data:', error);
@@ -187,7 +165,10 @@ class SmartmiP1Device extends Homey.Device {
   async onCapabilityOnoff(value) {
     this.log('Setting power:', value);
     try {
-      await this.device.set({ dps: 1, set: value });
+      // Power is controlled through fan speed
+      // Turn on: set to minimum speed (1), Turn off: set to 0
+      const fanSpeed = value ? 1 : 0;
+      await this.device.set({ dps: 109, set: fanSpeed });
       return true;
     } catch (error) {
       this.error('Failed to set power:', error);
@@ -201,9 +182,10 @@ class SmartmiP1Device extends Homey.Device {
   async onCapabilityDim(value) {
     this.log('Setting fan speed:', value);
     try {
-      // Convert 0-1 to 0-100 or 1-3 depending on device
-      const fanSpeed = Math.round(value * 100);
-      await this.device.set({ dps: 3, set: fanSpeed });
+      // Convert 0-1 to 1-100 (device range)
+      // Minimum is 1 when on, 0 means off
+      const fanSpeed = value > 0 ? Math.max(1, Math.round(value * 100)) : 0;
+      await this.device.set({ dps: 109, set: fanSpeed });
       return true;
     } catch (error) {
       this.error('Failed to set fan speed:', error);
@@ -217,15 +199,8 @@ class SmartmiP1Device extends Homey.Device {
   async onCapabilityMode(value) {
     this.log('Setting mode:', value);
     try {
-      // Convert Homey capability value (US spelling) to Tuya DPS value (UK spelling)
-      const modeMap = {
-        'auto': 'auto',
-        'sleep': 'sleep',
-        'favorite': 'favourite',
-        'manual': 'manual',
-      };
-      const mode = modeMap[value] || 'auto';
-      await this.device.set({ dps: 2, set: mode });
+      // Valid modes: auto, sleep, strong, manual
+      await this.device.set({ dps: 3, set: value });
       return true;
     } catch (error) {
       this.error('Failed to set mode:', error);
@@ -239,7 +214,7 @@ class SmartmiP1Device extends Homey.Device {
   async onCapabilityChildLock(value) {
     this.log('Setting child lock:', value);
     try {
-      await this.device.set({ dps: 5, set: value });
+      await this.device.set({ dps: 7, set: value });
       return true;
     } catch (error) {
       this.error('Failed to set child lock:', error);

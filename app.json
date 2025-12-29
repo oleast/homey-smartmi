@@ -53,8 +53,6 @@
         "dim",
         "air_purifier_mode",
         "measure_pm25",
-        "measure_temperature",
-        "measure_humidity",
         "child_lock",
         "filter_life"
       ],
@@ -187,9 +185,9 @@
           }
         },
         {
-          "id": "favorite",
+          "id": "strong",
           "title": {
-            "en": "Favorite"
+            "en": "Strong"
           }
         },
         {

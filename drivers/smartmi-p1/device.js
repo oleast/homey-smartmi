@@ -139,6 +139,19 @@ class SmartmiP1Device extends Homey.Device {
       if (value === undefined || value === null) {
         return defaultValue;
       }
+      // Handle various representations of boolean values
+      if (typeof value === 'boolean') {
+        return value;
+      }
+      if (typeof value === 'string') {
+        const lower = value.toLowerCase();
+        if (lower === 'true' || lower === '1') return true;
+        if (lower === 'false' || lower === '0') return false;
+      }
+      if (typeof value === 'number') {
+        return value !== 0;
+      }
+      // For any other truthy/falsy value
       return Boolean(value);
     } catch (error) {
       this.error(`Error getting DPS ${dpsId} as boolean:`, error);
@@ -189,7 +202,18 @@ class SmartmiP1Device extends Homey.Device {
    */
   async setDpsBool(dpsId, value) {
     try {
-      const boolValue = Boolean(value);
+      // Ensure we send a proper boolean value
+      let boolValue;
+      if (typeof value === 'boolean') {
+        boolValue = value;
+      } else if (typeof value === 'string') {
+        const lower = value.toLowerCase();
+        boolValue = (lower === 'true' || lower === '1');
+      } else if (typeof value === 'number') {
+        boolValue = value !== 0;
+      } else {
+        boolValue = Boolean(value);
+      }
       await this.device.set({ dps: dpsId, set: boolValue });
     } catch (error) {
       this.error(`Error setting DPS ${dpsId} to boolean ${value}:`, error);

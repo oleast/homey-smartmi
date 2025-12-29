@@ -1,4 +1,4 @@
-import { Device } from 'homey';
+import Homey from 'homey';
 import TuyAPI from 'tuyapi';
 
 interface DeviceSettings {
@@ -17,7 +17,7 @@ interface TuyaDeviceData {
   [key: number]: any;
 }
 
-class SmartmiP1Device extends Device {
+class SmartmiP1Device extends Homey.Device {
   private device!: TuyAPI;
   private connected: boolean = false;
   private pollingInterval?: NodeJS.Timeout;
@@ -419,4 +419,4 @@ class SmartmiP1Device extends Device {
   }
 }
 
-export = SmartmiP1Device;
+module.exports = SmartmiP1Device;

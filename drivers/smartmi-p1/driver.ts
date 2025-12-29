@@ -1,4 +1,4 @@
-import { Driver } from 'homey';
+import Homey from 'homey';
 
 interface PairDevice {
   ipAddress: string;
@@ -7,13 +7,7 @@ interface PairDevice {
   protocol: string;
 }
 
-interface PairSession {
-  setHandler(event: string, handler: (...args: any[]) => Promise<any>): void;
-  showView(viewId: string): Promise<void>;
-  emit(event: string, ...args: any[]): void;
-}
-
-class SmartmiP1Driver extends Driver {
+class SmartmiP1Driver extends Homey.Driver {
   pairDevice: PairDevice | undefined;
 
   /**
@@ -36,7 +30,7 @@ class SmartmiP1Driver extends Driver {
   /**
    * onPair is called when a user starts pairing a device
    */
-  async onPair(session: PairSession): Promise<void> {
+  async onPair(session: any): Promise<void> {
     // Device credentials will be stored here
     this.pairDevice = {
       ipAddress: '',
@@ -67,4 +61,4 @@ class SmartmiP1Driver extends Driver {
   }
 }
 
-export = SmartmiP1Driver;
+module.exports = SmartmiP1Driver;

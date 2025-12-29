@@ -1,3 +1,47 @@
+declare module 'homey' {
+  namespace Homey {
+    class App {
+      log(...args: any[]): void;
+      error(...args: any[]): void;
+      onInit(): Promise<void>;
+    }
+
+    class Driver {
+      homey: any;
+      log(...args: any[]): void;
+      error(...args: any[]): void;
+      onInit(): Promise<void>;
+      onPair(session: any): Promise<void>;
+      onPairListDevices(): Promise<any[]>;
+    }
+
+    class Device {
+      homey: any;
+      log(...args: any[]): void;
+      error(...args: any[]): void;
+      onInit(): Promise<void>;
+      onDeleted(): Promise<void>;
+      onSettings(params: {
+        oldSettings: any;
+        newSettings: any;
+        changedKeys: string[];
+      }): Promise<void>;
+      getSettings(): any;
+      setSettings(settings: any): Promise<void>;
+      getCapabilityValue(capabilityId: string): any;
+      setCapabilityValue(capabilityId: string, value: any): Promise<void>;
+      registerCapabilityListener(
+        capabilityId: string,
+        listener: (value: any) => Promise<boolean>
+      ): void;
+      setAvailable(): Promise<void>;
+      setUnavailable(message?: string): Promise<void>;
+    }
+  }
+
+  export = Homey;
+}
+
 declare module 'tuyapi' {
   interface TuyAPIOptions {
     id: string;

@@ -2,9 +2,10 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-const homey_1 = require("homey");
+Object.defineProperty(exports, "__esModule", { value: true });
+const homey_1 = __importDefault(require("homey"));
 const tuyapi_1 = __importDefault(require("tuyapi"));
-class SmartmiP1Device extends homey_1.Device {
+class SmartmiP1Device extends homey_1.default.Device {
     constructor() {
         super(...arguments);
         this.connected = false;
@@ -378,4 +379,3 @@ class SmartmiP1Device extends homey_1.Device {
     }
 }
 module.exports = SmartmiP1Device;
-//# sourceMappingURL=device.js.map

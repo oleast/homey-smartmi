@@ -1,6 +1,10 @@
 "use strict";
-const homey_1 = require("homey");
-class SmartmiP1Driver extends homey_1.Driver {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const homey_1 = __importDefault(require("homey"));
+class SmartmiP1Driver extends homey_1.default.Driver {
     /**
      * onInit is called when the driver is initialized.
      */
@@ -29,13 +33,14 @@ class SmartmiP1Driver extends homey_1.Driver {
         };
         // Handler for manual pairing form submission
         session.setHandler('list_devices', async () => {
+            var _a;
             // Since we don't have discovery, user must manually configure via settings
             // Return a placeholder device
             return [
                 {
                     name: 'Smartmi Air Purifier P1',
                     data: {
-                        id: this.pairDevice?.deviceId || `smartmi-p1-${Date.now()}`,
+                        id: ((_a = this.pairDevice) === null || _a === void 0 ? void 0 : _a.deviceId) || `smartmi-p1-${Date.now()}`,
                     },
                     settings: {
                         ipAddress: '',
@@ -49,4 +54,3 @@ class SmartmiP1Driver extends homey_1.Driver {
     }
 }
 module.exports = SmartmiP1Driver;
-//# sourceMappingURL=driver.js.map

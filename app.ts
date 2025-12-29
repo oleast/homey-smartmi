@@ -1,6 +1,6 @@
-import { App } from 'homey';
+import Homey from 'homey';
 
-class SmartmiApp extends App {
+class SmartmiApp extends Homey.App {
   /**
    * onInit is called when the app is initialized.
    */
@@ -9,4 +9,4 @@ class SmartmiApp extends App {
   }
 }
 
-export = SmartmiApp;
+module.exports = SmartmiApp;

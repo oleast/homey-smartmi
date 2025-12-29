@@ -10,7 +10,7 @@
     "en": "Smartmi Air Purifier"
   },
   "description": {
-    "en": "Control your Smartmi Air Purifier devices"
+    "en": "Unofficial Homey app to control Smartmi Air Purifier devices via local Tuya protocol"
   },
   "category": [
     "climate"
@@ -22,8 +22,8 @@
     "xlarge": "/assets/images/xlarge.png"
   },
   "author": {
-    "name": "Smartmi",
-    "email": "support@smartmi.com"
+    "name": "oleast",
+    "email": ""
   },
   "contributors": {
     "developers": []
@@ -41,6 +41,7 @@
   "source": "https://github.com/oleast/homey-smartmi",
   "homeyCommunityTopicId": 0,
   "support": "",
+  "brandColor": "#2196F3",
   "drivers": [
     {
       "id": "smartmi-p1",
@@ -53,8 +54,14 @@
         "dim",
         "air_purifier_mode",
         "measure_pm25",
+        "measure_pm10",
         "child_lock",
-        "filter_life"
+        "sound_enabled",
+        "screen_brightness",
+        "timer_mode",
+        "timer_remaining",
+        "filter_life",
+        "filter_usage"
       ],
       "capabilitiesOptions": {
         "dim": {
@@ -220,6 +227,132 @@
       },
       "min": 0,
       "max": 100
+    },
+    "measure_pm10": {
+      "type": "number",
+      "title": {
+        "en": "PM10"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "units": {
+        "en": "µg/m³"
+      },
+      "min": 0,
+      "icon": "/assets/pm10.svg"
+    },
+    "sound_enabled": {
+      "type": "boolean",
+      "title": {
+        "en": "Sound"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/sound.svg"
+    },
+    "screen_brightness": {
+      "type": "enum",
+      "title": {
+        "en": "Screen Brightness"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "values": [
+        {
+          "id": "auto",
+          "title": {
+            "en": "Auto"
+          }
+        },
+        {
+          "id": "off",
+          "title": {
+            "en": "Off"
+          }
+        },
+        {
+          "id": "dim",
+          "title": {
+            "en": "Dim"
+          }
+        },
+        {
+          "id": "bright",
+          "title": {
+            "en": "Bright"
+          }
+        }
+      ]
+    },
+    "timer_mode": {
+      "type": "enum",
+      "title": {
+        "en": "Timer"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "values": [
+        {
+          "id": "off",
+          "title": {
+            "en": "Off"
+          }
+        },
+        {
+          "id": "1_hour",
+          "title": {
+            "en": "1 hour"
+          }
+        },
+        {
+          "id": "2_hour",
+          "title": {
+            "en": "2 hours"
+          }
+        },
+        {
+          "id": "4_hour",
+          "title": {
+            "en": "4 hours"
+          }
+        },
+        {
+          "id": "8_hour",
+          "title": {
+            "en": "8 hours"
+          }
+        }
+      ]
+    },
+    "timer_remaining": {
+      "type": "number",
+      "title": {
+        "en": "Timer Remaining"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "units": {
+        "en": "min"
+      },
+      "min": 0
+    },
+    "filter_usage": {
+      "type": "number",
+      "title": {
+        "en": "Filter Usage"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "units": {
+        "en": "h"
+      },
+      "min": 0
     }
   }
 }

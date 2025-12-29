@@ -27,6 +27,9 @@ class SmartmiP1Device extends homey_1.default.Device {
         this.registerCapabilityListener('dim', this.onCapabilityDim.bind(this));
         this.registerCapabilityListener('air_purifier_mode', this.onCapabilityMode.bind(this));
         this.registerCapabilityListener('child_lock', this.onCapabilityChildLock.bind(this));
+        this.registerCapabilityListener('sound_enabled', this.onCapabilitySound.bind(this));
+        this.registerCapabilityListener('screen_brightness', this.onCapabilityScreenBrightness.bind(this));
+        this.registerCapabilityListener('timer_mode', this.onCapabilityTimer.bind(this));
         // Start polling for device status
         this.startPolling();
     }
@@ -234,10 +237,48 @@ class SmartmiP1Device extends homey_1.default.Device {
                 const pm25 = this.getDpsInt(dps, 2, 0);
                 this.setCapabilityValue('measure_pm25', pm25).catch(this.error);
             }
+            // DPS 102: PM10 value
+            if (dps[102] !== undefined) {
+                const pm10 = this.getDpsInt(dps, 102, 0);
+                this.setCapabilityValue('measure_pm10', pm10).catch(this.error);
+            }
             // DPS 104: Filter life remaining (percentage)
             if (dps[104] !== undefined) {
                 const filterLife = this.getDpsInt(dps, 104, 0);
                 this.setCapabilityValue('filter_life', filterLife).catch(this.error);
+            }
+            // DPS 105: Filter usage (hours)
+            if (dps[105] !== undefined) {
+                const filterUsage = this.getDpsInt(dps, 105, 0);
+                this.setCapabilityValue('filter_usage', filterUsage).catch(this.error);
+            }
+            // DPS 101: Sound enabled
+            if (dps[101] !== undefined) {
+                const soundEnabled = this.getDpsBool(dps, 101, false);
+                this.setCapabilityValue('sound_enabled', soundEnabled).catch(this.error);
+            }
+            // DPS 110: Screen brightness (BRIGHTNESS_AUTO, BRIGHTNESS_OFF, BRIGHTNESS_LOW, BRIGHTNESS_HIGH)
+            if (dps[110] !== undefined) {
+                const brightnessRaw = this.getDpsString(dps, 110, 'BRIGHTNESS_AUTO');
+                const brightnessMap = {
+                    'BRIGHTNESS_AUTO': 'auto',
+                    'BRIGHTNESS_OFF': 'off',
+                    'BRIGHTNESS_LOW': 'dim',
+                    'BRIGHTNESS_HIGH': 'bright'
+                };
+                const brightness = brightnessMap[brightnessRaw] || 'auto';
+                this.setCapabilityValue('screen_brightness', brightness).catch(this.error);
+            }
+            // DPS 103: Timer (0_hour, 1_hour, 2_hour, 4_hour, 8_hour)
+            if (dps[103] !== undefined) {
+                const timer = this.getDpsString(dps, 103, '0_hour');
+                const timerValue = timer === '0_hour' ? 'off' : timer;
+                this.setCapabilityValue('timer_mode', timerValue).catch(this.error);
+            }
+            // DPS 19: Timer remaining (minutes)
+            if (dps[19] !== undefined) {
+                const timerRemaining = this.getDpsInt(dps, 19, 0);
+                this.setCapabilityValue('timer_remaining', timerRemaining).catch(this.error);
             }
         }
         catch (error) {
@@ -339,6 +380,56 @@ class SmartmiP1Device extends homey_1.default.Device {
         }
         catch (error) {
             this.error('Failed to set child lock:', error);
+            throw error;
+        }
+    }
+    /**
+     * Handle sound capability
+     */
+    async onCapabilitySound(value) {
+        this.log('Setting sound:', value);
+        try {
+            await this.setDpsBool(101, value);
+            return true;
+        }
+        catch (error) {
+            this.error('Failed to set sound:', error);
+            throw error;
+        }
+    }
+    /**
+     * Handle screen brightness capability
+     */
+    async onCapabilityScreenBrightness(value) {
+        this.log('Setting screen brightness:', value);
+        try {
+            const brightnessMap = {
+                'auto': 'BRIGHTNESS_AUTO',
+                'off': 'BRIGHTNESS_OFF',
+                'dim': 'BRIGHTNESS_LOW',
+                'bright': 'BRIGHTNESS_HIGH'
+            };
+            const brightness = brightnessMap[value] || 'BRIGHTNESS_AUTO';
+            await this.setDpsString(110, brightness);
+            return true;
+        }
+        catch (error) {
+            this.error('Failed to set screen brightness:', error);
+            throw error;
+        }
+    }
+    /**
+     * Handle timer capability
+     */
+    async onCapabilityTimer(value) {
+        this.log('Setting timer:', value);
+        try {
+            const timerValue = value === 'off' ? '0_hour' : value;
+            await this.setDpsString(103, timerValue);
+            return true;
+        }
+        catch (error) {
+            this.error('Failed to set timer:', error);
             throw error;
         }
     }

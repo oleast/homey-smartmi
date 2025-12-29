@@ -1,4 +1,6 @@
-# Smartmi Air Purifier for Homey
+# Smartmi Air Purifier for Homey (Unofficial)
+
+**Note:** This is an unofficial, community-developed app for controlling Smartmi Air Purifier devices from your Homey Pro smart home system. This app is not affiliated with or endorsed by Smartmi.
 
 Control your Smartmi Air Purifier devices from your Homey Pro smart home system.
 
@@ -10,10 +12,14 @@ Control your Smartmi Air Purifier devices from your Homey Pro smart home system.
 
 - Power on/off control
 - Air purifier mode selection (Auto, Sleep, Strong, Manual)
-- Fan speed control
-- PM2.5 air quality monitoring
+- Fan speed control (1-100%)
+- PM2.5 and PM10 air quality monitoring
 - Child lock control
-- Filter life monitoring
+- Filter life monitoring (percentage remaining and hours used)
+- Sound control
+- Screen brightness control (Auto, Off, Dim, Bright)
+- Timer control (Off, 1h, 2h, 4h, 8h)
+- Timer remaining display
 
 ## Development
 

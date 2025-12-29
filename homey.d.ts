@@ -87,3 +87,11 @@ declare module 'tuyapi' {
 
   export = TuyAPI;
 }
+
+// Minimal Node.js types for module.exports and timers
+declare var module: { exports: any };
+declare function setInterval(callback: (...args: any[]) => void, ms: number): any;
+declare function clearInterval(intervalId: any): void;
+declare namespace NodeJS {
+  type Timeout = any;
+}

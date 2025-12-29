@@ -82,6 +82,122 @@ class SmartmiP1Device extends Homey.Device {
   }
 
   /**
+   * Get integer value from DPS with error handling
+   * @param {object} dps - DPS data object
+   * @param {number} dpsId - DPS ID as integer
+   * @param {number} defaultValue - Default value if DPS not found or invalid
+   * @returns {number} - Parsed integer value
+   */
+  getDpsInt(dps, dpsId, defaultValue = 0) {
+    try {
+      const value = dps[dpsId];
+      if (value === undefined || value === null) {
+        return defaultValue;
+      }
+      const parsed = parseInt(value, 10);
+      if (isNaN(parsed)) {
+        this.error(`Invalid integer value for DPS ${dpsId}: ${value}`);
+        return defaultValue;
+      }
+      return parsed;
+    } catch (error) {
+      this.error(`Error getting DPS ${dpsId} as integer:`, error);
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Get string value from DPS with error handling
+   * @param {object} dps - DPS data object
+   * @param {number} dpsId - DPS ID as integer
+   * @param {string} defaultValue - Default value if DPS not found or invalid
+   * @returns {string} - String value
+   */
+  getDpsString(dps, dpsId, defaultValue = '') {
+    try {
+      const value = dps[dpsId];
+      if (value === undefined || value === null) {
+        return defaultValue;
+      }
+      return String(value);
+    } catch (error) {
+      this.error(`Error getting DPS ${dpsId} as string:`, error);
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Get boolean value from DPS with error handling
+   * @param {object} dps - DPS data object
+   * @param {number} dpsId - DPS ID as integer
+   * @param {boolean} defaultValue - Default value if DPS not found or invalid
+   * @returns {boolean} - Boolean value
+   */
+  getDpsBool(dps, dpsId, defaultValue = false) {
+    try {
+      const value = dps[dpsId];
+      if (value === undefined || value === null) {
+        return defaultValue;
+      }
+      return Boolean(value);
+    } catch (error) {
+      this.error(`Error getting DPS ${dpsId} as boolean:`, error);
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Set integer value to DPS with error handling
+   * @param {number} dpsId - DPS ID as integer
+   * @param {number} value - Integer value to set
+   * @returns {Promise<void>}
+   */
+  async setDpsInt(dpsId, value) {
+    try {
+      const intValue = parseInt(value, 10);
+      if (isNaN(intValue)) {
+        throw new Error(`Invalid integer value for DPS ${dpsId}: ${value}`);
+      }
+      await this.device.set({ dps: dpsId, set: intValue });
+    } catch (error) {
+      this.error(`Error setting DPS ${dpsId} to integer ${value}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Set string value to DPS with error handling
+   * @param {number} dpsId - DPS ID as integer
+   * @param {string} value - String value to set
+   * @returns {Promise<void>}
+   */
+  async setDpsString(dpsId, value) {
+    try {
+      const stringValue = String(value);
+      await this.device.set({ dps: dpsId, set: stringValue });
+    } catch (error) {
+      this.error(`Error setting DPS ${dpsId} to string ${value}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Set boolean value to DPS with error handling
+   * @param {number} dpsId - DPS ID as integer
+   * @param {boolean} value - Boolean value to set
+   * @returns {Promise<void>}
+   */
+  async setDpsBool(dpsId, value) {
+    try {
+      const boolValue = Boolean(value);
+      await this.device.set({ dps: dpsId, set: boolValue });
+    } catch (error) {
+      this.error(`Error setting DPS ${dpsId} to boolean ${value}:`, error);
+      throw error;
+    }
+  }
+
+  /**
    * Handle incoming device data
    */
   handleDeviceData(data) {
@@ -96,8 +212,8 @@ class SmartmiP1Device extends Homey.Device {
       // When fan speed > 0, device is on; when fan speed = 0, device is off
       
       // DPS 109: Fan speed (1-100)
-      if (dps['109'] !== undefined) {
-        const fanSpeed = parseInt(dps['109'], 10);
+      if (dps[109] !== undefined) {
+        const fanSpeed = this.getDpsInt(dps, 109, 0);
         // Update power state based on fan speed
         const isOn = fanSpeed > 0;
         this.setCapabilityValue('onoff', isOn).catch(this.error);
@@ -106,24 +222,27 @@ class SmartmiP1Device extends Homey.Device {
       }
 
       // DPS 3: Mode (auto, sleep, strong, manual)
-      if (dps['3'] !== undefined) {
-        const mode = dps['3'];
+      if (dps[3] !== undefined) {
+        const mode = this.getDpsString(dps, 3, 'auto');
         this.setCapabilityValue('air_purifier_mode', mode).catch(this.error);
       }
 
       // DPS 7: Child lock
-      if (dps['7'] !== undefined) {
-        this.setCapabilityValue('child_lock', dps['7']).catch(this.error);
+      if (dps[7] !== undefined) {
+        const childLock = this.getDpsBool(dps, 7, false);
+        this.setCapabilityValue('child_lock', childLock).catch(this.error);
       }
 
       // DPS 2: PM2.5 value
-      if (dps['2'] !== undefined) {
-        this.setCapabilityValue('measure_pm25', parseInt(dps['2'], 10)).catch(this.error);
+      if (dps[2] !== undefined) {
+        const pm25 = this.getDpsInt(dps, 2, 0);
+        this.setCapabilityValue('measure_pm25', pm25).catch(this.error);
       }
 
       // DPS 104: Filter life remaining (percentage)
-      if (dps['104'] !== undefined) {
-        this.setCapabilityValue('filter_life', parseInt(dps['104'], 10)).catch(this.error);
+      if (dps[104] !== undefined) {
+        const filterLife = this.getDpsInt(dps, 104, 0);
+        this.setCapabilityValue('filter_life', filterLife).catch(this.error);
       }
     } catch (error) {
       this.error('Error handling device data:', error);
@@ -169,10 +288,10 @@ class SmartmiP1Device extends Homey.Device {
         // Turn on: restore previous fan speed or use minimum (1)
         const currentDim = this.getCapabilityValue('dim') || 0;
         const fanSpeed = currentDim > 0 ? Math.max(1, Math.round(currentDim * 100)) : 1;
-        await this.device.set({ dps: 109, set: fanSpeed });
+        await this.setDpsInt(109, fanSpeed);
       } else {
         // Turn off: set fan speed to 0
-        await this.device.set({ dps: 109, set: 0 });
+        await this.setDpsInt(109, 0);
       }
       return true;
     } catch (error) {
@@ -190,7 +309,7 @@ class SmartmiP1Device extends Homey.Device {
       // Convert 0-1 to 1-100 (device range)
       // Minimum is 1 when on, 0 means off
       const fanSpeed = value > 0 ? Math.max(1, Math.round(value * 100)) : 0;
-      await this.device.set({ dps: 109, set: fanSpeed });
+      await this.setDpsInt(109, fanSpeed);
       return true;
     } catch (error) {
       this.error('Failed to set fan speed:', error);
@@ -205,7 +324,7 @@ class SmartmiP1Device extends Homey.Device {
     this.log('Setting mode:', value);
     try {
       // Valid modes: auto, sleep, strong, manual
-      await this.device.set({ dps: 3, set: value });
+      await this.setDpsString(3, value);
       return true;
     } catch (error) {
       this.error('Failed to set mode:', error);
@@ -219,7 +338,7 @@ class SmartmiP1Device extends Homey.Device {
   async onCapabilityChildLock(value) {
     this.log('Setting child lock:', value);
     try {
-      await this.device.set({ dps: 7, set: value });
+      await this.setDpsBool(7, value);
       return true;
     } catch (error) {
       this.error('Failed to set child lock:', error);

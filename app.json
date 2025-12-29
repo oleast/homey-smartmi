@@ -1,0 +1,227 @@
+{
+  "id": "com.smartmi.airpurifier",
+  "version": "1.0.0",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "Smartmi Air Purifier"
+  },
+  "description": {
+    "en": "Control your Smartmi Air Purifier devices"
+  },
+  "category": [
+    "climate"
+  ],
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Smartmi",
+    "email": "support@smartmi.com"
+  },
+  "contributors": {
+    "developers": []
+  },
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": ""
+      }
+    }
+  },
+  "bugs": {
+    "url": "https://github.com/oleast/homey-smartmi/issues"
+  },
+  "source": "https://github.com/oleast/homey-smartmi",
+  "homeyCommunityTopicId": 0,
+  "support": "",
+  "drivers": [
+    {
+      "id": "smartmi-p1",
+      "name": {
+        "en": "Smartmi Air Purifier P1"
+      },
+      "class": "air_purifier",
+      "capabilities": [
+        "onoff",
+        "dim",
+        "air_purifier_mode",
+        "measure_pm25",
+        "measure_temperature",
+        "measure_humidity",
+        "child_lock",
+        "filter_life"
+      ],
+      "capabilitiesOptions": {
+        "dim": {
+          "title": {
+            "en": "Fan Speed"
+          },
+          "min": 0,
+          "max": 1,
+          "step": 0.01
+        }
+      },
+      "energy": {
+        "approximation": {
+          "usageConstant": 35
+        }
+      },
+      "images": {
+        "small": "/drivers/smartmi-p1/assets/images/small.png",
+        "large": "/drivers/smartmi-p1/assets/images/large.png",
+        "xlarge": "/drivers/smartmi-p1/assets/images/xlarge.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Device Settings"
+          },
+          "children": [
+            {
+              "id": "ipAddress",
+              "type": "text",
+              "label": {
+                "en": "IP Address"
+              },
+              "value": "",
+              "hint": {
+                "en": "The IP address of your Smartmi Air Purifier P1"
+              }
+            },
+            {
+              "id": "localKey",
+              "type": "text",
+              "label": {
+                "en": "Local Key"
+              },
+              "value": "",
+              "hint": {
+                "en": "The local key for your device (obtained from Tuya/Smartmi app)"
+              }
+            },
+            {
+              "id": "deviceId",
+              "type": "text",
+              "label": {
+                "en": "Device ID"
+              },
+              "value": "",
+              "hint": {
+                "en": "The device ID (obtained from Tuya/Smartmi app)"
+              }
+            },
+            {
+              "id": "protocol",
+              "type": "dropdown",
+              "label": {
+                "en": "Protocol Version"
+              },
+              "value": "3.3",
+              "values": [
+                {
+                  "id": "3.1",
+                  "label": {
+                    "en": "3.1"
+                  }
+                },
+                {
+                  "id": "3.3",
+                  "label": {
+                    "en": "3.3"
+                  }
+                },
+                {
+                  "id": "3.4",
+                  "label": {
+                    "en": "3.4"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "capabilities": {
+    "air_purifier_mode": {
+      "type": "enum",
+      "title": {
+        "en": "Mode"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "values": [
+        {
+          "id": "auto",
+          "title": {
+            "en": "Auto"
+          }
+        },
+        {
+          "id": "sleep",
+          "title": {
+            "en": "Sleep"
+          }
+        },
+        {
+          "id": "favorite",
+          "title": {
+            "en": "Favorite"
+          }
+        },
+        {
+          "id": "manual",
+          "title": {
+            "en": "Manual"
+          }
+        }
+      ]
+    },
+    "child_lock": {
+      "type": "boolean",
+      "title": {
+        "en": "Child Lock"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle"
+    },
+    "filter_life": {
+      "type": "number",
+      "title": {
+        "en": "Filter Life"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "units": {
+        "en": "%"
+      },
+      "min": 0,
+      "max": 100
+    }
+  }
+}

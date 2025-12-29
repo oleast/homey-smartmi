@@ -6,3 +6,5 @@ npm-debug.log
 .homeychangelog.json
 .homeybuild/
 env.json
+dist/
+*.tsbuildinfo

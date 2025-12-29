@@ -9,12 +9,21 @@ Control your Smartmi Air Purifier devices from your Homey Pro smart home system.
 ## Features
 
 - Power on/off control
-- Air purifier mode selection (Auto, Sleep, Favorite, Manual)
+- Air purifier mode selection (Auto, Sleep, Strong, Manual)
 - Fan speed control
 - PM2.5 air quality monitoring
-- Temperature and humidity monitoring
 - Child lock control
 - Filter life monitoring
+
+## Development
+
+This app is written in **TypeScript** for better type safety and maintainability. See [TYPESCRIPT.md](TYPESCRIPT.md) for development guidelines.
+
+To build the app:
+```bash
+npm install
+npm run build
+```
 
 ## Setup
 

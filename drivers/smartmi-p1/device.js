@@ -165,10 +165,15 @@ class SmartmiP1Device extends Homey.Device {
   async onCapabilityOnoff(value) {
     this.log('Setting power:', value);
     try {
-      // Power is controlled through fan speed
-      // Turn on: set to minimum speed (1), Turn off: set to 0
-      const fanSpeed = value ? 1 : 0;
-      await this.device.set({ dps: 109, set: fanSpeed });
+      if (value) {
+        // Turn on: restore previous fan speed or use minimum (1)
+        const currentDim = this.getCapabilityValue('dim') || 0;
+        const fanSpeed = currentDim > 0 ? Math.max(1, Math.round(currentDim * 100)) : 1;
+        await this.device.set({ dps: 109, set: fanSpeed });
+      } else {
+        // Turn off: set fan speed to 0
+        await this.device.set({ dps: 109, set: 0 });
+      }
       return true;
     } catch (error) {
       this.error('Failed to set power:', error);
